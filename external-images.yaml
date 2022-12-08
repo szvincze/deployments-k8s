@@ -19,4 +19,3 @@ images:
   - otel/opentelemetry-collector:0.35.0
   - prom/prometheus:v2.37.0
   - networkstatic/iperf3:latest
-  - quay.io/acmenezes/nsm-operator:v1.6.0
