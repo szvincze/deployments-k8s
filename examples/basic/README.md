@@ -65,5 +65,5 @@ kubectl delete -n nsm nsm nsm-basic-sample
 
 Delete NSM operator and all its dependencies:
 ```bash
-kubectl delete -f ../../apps/nsm-operator/nsm-operator.yaml
+kubectl delete -k ../../apps/nsm-operator
 ```
