@@ -1,0 +1,20 @@
+apiVersion: nsm.networkservicemesh.io/v1alpha1
+kind: NSM
+metadata:
+  name: nsm-memory-sample
+  namespace: nsm
+spec:
+  version: v1.6.0
+  nsmPullPolicy: IfNotPresent
+  nsmLogLevel: TRACE
+  webhookImage: ghcr.io/networkservicemesh/cmd-admission-webhook-k8s:v1.6.0
+
+  # Forwarding Plane configuration
+  forwarders:
+    - type: vpp
+      image: ghcr.io/networkservicemesh/cmd-forwarder-vpp:v1.6.0
+
+  # Registry configuration
+  registry:
+    type: memory
+    image: ghcr.io/networkservicemesh/cmd-registry-memory:v1.6.0

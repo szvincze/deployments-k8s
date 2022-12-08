@@ -23,30 +23,47 @@ Contain basic setup for NSM that includes `nsmgr`, `forwarder-vpp`, `registry-k8
 
 ## Run
 
-1. Create ns for deployments:
+1. Deploy NSM Operator:
 ```bash
-kubectl create ns nsm-system
+kubectl apply -k ../../apps/nsm-operator
 ```
 
-2. Apply NSM resources for basic tests:
-
+2. Wait for NSM Operator pod status ready:
 ```bash
-kubectl apply -k https://github.com/networkservicemesh/deployments-k8s/examples/basic?ref=v1.6.0
+kubectl wait -n nsm --timeout=1m --for=condition=ready pod -l control-plane=nsm-operator
 ```
 
-3. Wait for admission-webhook-k8s:
+3. Apply NSM resources for basic tests:
 
 ```bash
-WH=$(kubectl get pods -l app=admission-webhook-k8s -n nsm-system --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}')
-kubectl wait --for=condition=ready --timeout=1m pod ${WH} -n nsm-system
+kubectl apply -f nsm-basic-sample.yaml
+```
+
+4. Wait for sample NSM pods status ready:
+```bash
+kubectl wait -n nsm --timeout=1m --for=condition=ready pod -l app=forwarder
+kubectl wait -n nsm --timeout=1m --for=condition=ready pod -l app=nsmgr
+kubectl wait -n nsm --timeout=1m --for=condition=ready pod -l app=nsm-registry
+WH=$(kubectl get pods -l app=admission-webhook-k8s -n nsm --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}')
+kubectl wait --for=condition=ready --timeout=1m pod ${WH} -n nsm
 ```
 
 ## Cleanup
 
 To free resources follow the next commands:
 
+Delete the webhook:
 ```bash
-WH=$(kubectl get pods -l app=admission-webhook-k8s -n nsm-system --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}')
+WH=$(kubectl get pods -l app=admission-webhook-k8s -n nsm --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}')
 kubectl delete mutatingwebhookconfiguration ${WH}
-kubectl delete ns nsm-system
+```
+
+Delete the NSM custom resource:
+```bash
+kubectl delete -n nsm nsm nsm-basic-sample
+```
+
+Delete NSM operator and all its dependencies:
+```bash
+kubectl delete -f ../../apps/nsm-operator/nsm-operator.yaml
 ```
